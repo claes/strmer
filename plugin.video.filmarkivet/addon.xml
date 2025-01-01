@@ -20,20 +20,6 @@
     <summary lang="de_DE">Filme vom Filmarchiv des schwedisches Filminstituts</summary>
     <description lang="en_GB">Filmarkivet is an archive of historical Swedish films, provided by the Swedish Film Institute.</description>
     <description lang="sv_SE">Filmarkivet är ett arkiv med historiska svenska filmer, publicerade av Svenska Filminstitutet.</description>
-    <description lang="de_DE">Filmarkivet ist ein Archiv von historischen schwedischen Filmen, veröffentlicht bei Svenska Filminstitutet.</description>
-    <news>v3.2.0 (2021-04-26)
-      [fix] Support Filmarkivet web changes
-      [update] Adapted to Matrix 
-    </news>
-    <news>v3.3.0 (2021-06-03)
-      [update] some minor optimizations
-      [update] code refactoring
-	    [update] added unit tests to detect web changes on https://filmarkivet.se 
-	    [update] added video info to context menu
-    </news>
-    <news>v3.4.0 (2024-01-01)
-      [fix] Adapted to web changes
-    </news>
     <assets>
       	<icon>resources/icon.png</icon>
     </assets>

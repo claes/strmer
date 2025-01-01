@@ -69,22 +69,6 @@ class Filmarkivet():
     def mode_url(self, mode):
         return "plugin://{0}?mode={1}".format(self.addon_utils.id, mode)
 
-    def get_categories(self):
-        html = self.webget.get_url("/")
-        soup = BeautifulSoup(html, "html.parser")
-        soup = soup.find("ul", {"class": "site-nav-menu"})
-        lists = soup.find_all("ul")
-        items = lists[0].find_all("li")
-        mode_url = self.mode_url("category")
-
-        for item in items[1:]:
-            li = self.ListItem(
-                item.a.string,
-                "{0}&url={1}".format(mode_url, item.a["href"]),
-                "",
-                ""
-            )
-            yield li
 
     def __get_range(self, soup):
         try:
@@ -95,22 +79,6 @@ class Filmarkivet():
             return [int(m_range[0]), int(m_range[1])], int(match.group(1))
         except Exception:
             return None, None
-
-    def get_theme_categories(self, url):
-        html = self.webget.get_url(url)
-        soup = BeautifulSoup(html, "html.parser")
-        soup = soup.find("div", {"class": "teacher-theme-list"})
-        categories = soup.find_all("a")
-        mode_url = self.mode_url("category")
-        for category in categories:
-            title = category.h2.text
-            category_url = "{0}&url={1}".format(mode_url, category.get("href"))
-            desc = ""
-            category = category.find("img").get("src")
-            img = re.sub(r".jpg.*", ".jpg", category)
-            li = self.ListItem(title, category_url, desc, img)
-            li.playable = False
-            yield li
 
     def get_url_movies(self, url, mode, page=1, limit=False):
         get_url = url
@@ -158,82 +126,6 @@ class Filmarkivet():
             )
             yield li
 
-
-
-    def get_letters(self):
-        mode_url = self.mode_url("letter")
-        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ":
-            li = self.ListItem(
-                letter, "{0}&l={1}".format(mode_url, letter), "", ""
-            )
-            yield li
-
-    def get_letter_movies(self, letter):
-        html = self.webget.get_url("/filmer-a-o/")
-        soup = BeautifulSoup(html, 'html.parser')
-        soup = soup.find("section", {"class": "block", "id": letter.lower()})
-        soup = soup.find("ul", {"class": "alphabetical"})
-        movies = soup.find_all("a")
-        mode_url = self.mode_url("watch")
-        for movie in movies:
-            title = movie.contents[0].strip()
-            url = "{0}&url={1}".format(
-                mode_url,
-                requests.utils.quote(movie["href"])
-            )
-            li = self.ListItem(title, url, None, None)
-            li.playable = True
-            yield li
-
-    def get_plot(self, content_url):
-        html = self.webget.get_url(content_url)
-        soup = BeautifulSoup(html, "html.parser")
-        return soup.find("meta", {"property": "og:description"}).get("content")
-
-    def get_themes(self):
-        html = self.webget.get_url("/")
-        soup = BeautifulSoup(html, "html.parser")
-        soup = soup.find("ul", {"class": "site-nav-menu"})
-        lists = soup.find_all("ul")
-        items = lists[1].find_all("li")
-        mode_url = self.mode_url("theme")
-        for item in items[1:]:
-            li = self.ListItem(
-                item.a.string,
-                "{0}&url={1}".format(
-                    mode_url, requests.utils.quote(item.a["href"])
-                ),
-                "",
-                ""
-            )
-            yield li
-
-    def get_media_url(self, url):
-        return "plugin://plugin.video.youtube/play/?video_id=_stePanx9dc"
-        html = self.webget.get_url(url)
-        soup = BeautifulSoup(html, "html.parser")
-        media_info = soup.find("div", {"class": "video-container"})
-        media_info = media_info.find(
-            "script", {"type": "text/javascript"}
-        ).decode()
-        media_info = media_info.replace("\t", "")
-        media_info = media_info.split("jQuery")[0]
-
-        start = media_info.find("{") + 1
-        end = media_info.rfind("}")
-        media_info = media_info[start:end]
-
-        for line in media_info.split("\n"):
-            if line.startswith("//"):  # line is a javascript comment, ignore
-                continue
-            if ("https" in line or "http" in line) and ".mp4" in line:  # bingo! video url found
-                start = line.find("\"") + 1
-                end = line.rfind("\"")
-                video_url = line[start:end]
-                return video_url
-
-        return None
-
     def parse_strm_and_nfo(self, file_path):
         if not file_path.endswith('.strm'):
             raise ValueError("Provided file must have a .strm extension")
@@ -268,16 +160,7 @@ class Filmarkivet():
     def list_strm_files(self, directory):
         if not os.path.isdir(directory):
             raise ValueError("Provided path must be a directory")
-
-        # Return a list of files with .strm extension
         return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm')]
-
-    # def list_strm_files(self, directory):
-    #     if not os.path.isdir(directory):
-    #         raise ValueError("Provided path must be a directory")
-
-    #     # Return an iterator for files with .strm extension
-    #     return (os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm'))
 
     def get_streams(self):
         strm_files = self.list_strm_files("/home/claes/tmp/Vimjoyer")
@@ -291,8 +174,6 @@ class Filmarkivet():
                 list_item = self.ListItem(
                     title=stream_info.title,
                     url = "{0}&url={1}".format(mode_url, stream_info.streamURL),
-                    # url="plugin://plugin.video.youtube/play/?video_id=WOw8MJYZjRI",
-                    # url=stream_info.streamURL,
                     description=stream_info.plot,
                     icon=stream_info.thumb
                 )
