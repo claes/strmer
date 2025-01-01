@@ -74,3 +74,4 @@ dmypy.json
 
 # Pylint reports
 pylint.log
+plugin.video.nfostreamer.zip

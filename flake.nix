@@ -31,10 +31,8 @@
           pkgs.python3
           pkgs.python310Packages.pip
           pkgs.python310Packages.virtualenv
-          #pkgs.kodi
-          pkgs.kodi.withPackages
-          (kodiPackages: with kodiPackages; [inputstream-adaptive])
           pkgs.zip
+          pkgs.unzip
           pkgs.git
         ];
       };
