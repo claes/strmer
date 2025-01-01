@@ -13,15 +13,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from bs4 import BeautifulSoup
-import resources.lib.webget as webget
-from resources.lib.kodiutils import AddonUtils
-import requests
-import re
 import os
 import xml.etree.ElementTree as ET
 
-class Filmarkivet():
+class StreamManager():
 
     class StreamInfo:
         def __init__(self, streamURL, title, sorttitle, plot, thumb, tag):

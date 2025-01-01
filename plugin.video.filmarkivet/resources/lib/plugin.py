@@ -17,17 +17,16 @@ import sys
 import requests
 import xbmcgui
 import xbmcplugin
-from resources.lib.filmarkivet import Filmarkivet
+from resources.lib.streammanager import StreamManager
 from resources.lib.kodiutils import AddonUtils
 from urllib.parse import parse_qs
-
 
 def run():
 
     addon_utils = AddonUtils()
     params = parse_qs(sys.argv[2][1:])
 
-    fa = Filmarkivet(addon_utils)
+    sm = StreamManager(addon_utils)
     if "mode" in params:
         try:
             mode = params["mode"][0]
@@ -36,7 +35,7 @@ def run():
 
             if mode == "streams":
                 path = url
-                contents = fa.get_streams(path)
+                contents = sm.get_streams(path)
                 addon_utils.view_menu(contents)
             if mode == "watch":
                 media_url = requests.utils.unquote(url)
@@ -47,4 +46,4 @@ def run():
         except Exception as e:
             addon_utils.show_error(e)
     else:
-        addon_utils.view_menu(fa.get_streams("/home/claes/tmp/Vimjoyer"))
+        addon_utils.view_menu(sm.get_streams("/home/claes/tmp/Vimjoyer"))
