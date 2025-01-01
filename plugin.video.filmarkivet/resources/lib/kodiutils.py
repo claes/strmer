@@ -55,11 +55,6 @@ class AddonUtils():
             if item.playable:
                 li.setProperty("IsPlayable", "true")
                 li.setInfo("video", {"plot": item.description})
-                # context_url = "{0}?mode={1}&title={2}&url={3}".format(
-                #     self.url, "plot", item.title, item.url)
-                # context_menu = [(self.localize(30024),
-                #                  "RunPlugin({0})".format(context_url))]
-                # li.addContextMenuItems(context_menu)
             items.append((item.url, li, not item.playable))
         xbmcplugin.addDirectoryItems(self.handle, items)
         xbmcplugin.endOfDirectory(self.handle)

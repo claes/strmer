@@ -23,7 +23,7 @@ from urllib.parse import parse_qs
 
 
 def run():
-    
+
     addon_utils = AddonUtils()
     params = parse_qs(sys.argv[2][1:])
 
@@ -38,8 +38,9 @@ def run():
             url = params["url"][0] if "url" in params else None
 
             if mode == "streams":
-                movies = fa.get_streams()
-                addon_utils.view_menu(movies)
+                path = url
+                contents = fa.get_streams(path)
+                addon_utils.view_menu(contents)
             if mode == "categories":
                 addon_utils.view_menu(fa.get_categories())
             if mode == "category" and url:
@@ -57,4 +58,4 @@ def run():
         except Exception as e:
             addon_utils.show_error(e)
     else:
-        addon_utils.view_menu(fa.get_mainmenu())
+        addon_utils.view_menu(fa.get_streams("/home/claes/tmp/Vimjoyer"))

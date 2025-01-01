@@ -157,18 +157,40 @@ class Filmarkivet():
         return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag)
 
 
+    def list_directories(self, path):
+        if not os.path.exists(path):
+            raise ValueError("The specified path does not exist.")
+        if not os.path.isdir(path):
+            raise ValueError("The specified path is not a directory.")
+        
+        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+
     def list_strm_files(self, directory):
         if not os.path.isdir(directory):
             raise ValueError("Provided path must be a directory")
         return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm')]
 
-    def get_streams(self):
-        strm_files = self.list_strm_files("/home/claes/tmp/Vimjoyer")
+    def get_streams(self, path):
         list_items = []
 
-        mode_url = self.mode_url("watch")
+        directories = self.list_directories(path) 
+        for dir in directories:
+            mode_url = self.mode_url("streams")
+            try:
+                list_item = self.ListItem(
+                    title=dir,
+                    url = "{0}&url={1}".format(mode_url, os.path.join(path, dir)),
+                    description="", 
+                    icon=""
+                )
+                list_item.playable = False
+                list_items.append(list_item)
+            except Exception as e:
+                print(f"Error processing file {file}: {e}")
 
+        strm_files = self.list_strm_files(path)
         for file in strm_files:
+            mode_url = self.mode_url("watch")
             try:
                 stream_info = self.parse_strm_and_nfo(file)
                 list_item = self.ListItem(
