@@ -14,18 +14,20 @@
 '''
 
 import os
+from datetime import datetime
 import xml.etree.ElementTree as ET
 
 class StreamManager():
 
     class StreamInfo:
-        def __init__(self, streamURL, title, sorttitle, plot, thumb, tag):
+        def __init__(self, streamURL, title, sorttitle, plot, thumb, tag, modified):
             self.streamURL = streamURL
             self.title = title
             self.sorttitle = sorttitle
             self.plot = plot
             self.thumb = thumb
             self.tag = tag
+            self.modified = modified
 
     class ListItem():
         def __init__(self, title, url, description, icon):
@@ -49,6 +51,7 @@ class StreamManager():
 
         with open(file_path, 'r', encoding='utf-8') as strm_file:
             streamURL = strm_file.read().strip()
+            modified_time = datetime.fromtimestamp(os.fstat(strm_file.fileno()).st_mtime)
 
         nfo_file_path = f"{base_name}.nfo"
 
@@ -64,7 +67,8 @@ class StreamManager():
         thumb = root.findtext('thumb', default='')
         tag = root.findtext('tag', default='')
 
-        return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag)
+        return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag, modified_time)
+        #return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag, 0)
 
 
     def list_directories(self, path):
@@ -78,7 +82,10 @@ class StreamManager():
     def list_strm_files(self, directory):
         if not os.path.isdir(directory):
             raise ValueError("Provided path must be a directory")
-        return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm')]
+
+        strm_files = [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm')]
+        strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)        
+        return strm_files
 
     def get_streams(self, path):
         list_items = []
