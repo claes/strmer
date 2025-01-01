@@ -1,1 +1,76 @@
 .direnv
+
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Pytest
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.swp
+*.tmp
+~$*
+
+# Django specific
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask specific
+instance/
+*.webassets-cache
+
+# Static and media files
+staticfiles/
+media/
+
+# Secrets
+*.env
+.env.*
+.envrc
+
+# Celery beat schedule files
+celerybeat-schedule
+
+# MyPy type-checking cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pylint reports
+pylint.log
