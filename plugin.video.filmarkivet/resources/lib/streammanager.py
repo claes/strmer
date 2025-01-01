@@ -85,7 +85,14 @@ class StreamManager():
         if not os.path.isdir(path):
             raise ValueError("The specified path is not a directory.")
         
-        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        directories = [
+            entry for entry in Path(path).iterdir()
+            if entry.is_dir()
+        ]
+        
+        directories.sort(key=lambda d: d.stat().st_mtime, reverse=True)
+        return [d.name for d in directories]
+
 
     def list_strm_files(self, directory):
         if not os.path.isdir(directory):
@@ -95,24 +102,28 @@ class StreamManager():
         strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)        
         return strm_files
 
-
-    def get_streams(self, path):
+    def get_streams(self, path, page, page_size):
+        if page < 1:
+            raise ValueError("Page number must be greater than or equal to 1.")
+        if page_size < 1:
+            raise ValueError("Page size must be greater than or equal to 1.")
+        
         list_items = []
 
-        directories = self.list_directories(path) 
+        directories = self.list_directories(path)
         for dir in directories:
             mode_url = self.mode_url("streams")
             try:
                 list_item = self.ListItem(
                     title=dir,
-                    url = "{0}&url={1}".format(mode_url, os.path.join(path, dir)),
-                    description="", 
+                    url="{0}&url={1}".format(mode_url, os.path.join(path, dir)),
+                    description="",
                     icon=""
                 )
                 list_item.playable = False
                 list_items.append(list_item)
             except Exception as e:
-                print(f"Error processing file {file}: {e}")
+                print(f"Error processing directory {dir}: {e}")
 
         strm_files = self.list_strm_files(path)
         for file in strm_files:
@@ -121,7 +132,7 @@ class StreamManager():
                 stream_info = self.parse_strm_and_nfo(file)
                 list_item = self.ListItem(
                     title=stream_info.title,
-                    url = "{0}&url={1}".format(mode_url, stream_info.streamURL),
+                    url="{0}&url={1}".format(mode_url, stream_info.streamURL),
                     description=stream_info.plot,
                     icon=stream_info.thumb
                 )
@@ -130,4 +141,11 @@ class StreamManager():
             except Exception as e:
                 print(f"Error processing file {file}: {e}")
 
-        return list_items
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+
+        sub_list = list_items[start_index:end_index] 
+        if end_index < len(list_items):
+            next_url = "{0}&url={1}&page={2}".format(self.mode_url("streams"), path, page + 1)
+            sub_list.append(self.ListItem("Next", next_url, None, None))
+        return sub_list

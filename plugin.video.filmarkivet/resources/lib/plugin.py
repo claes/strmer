@@ -25,6 +25,7 @@ def run():
 
     addon_utils = AddonUtils()
     params = parse_qs(sys.argv[2][1:])
+    page_size = 10
 
     sm = StreamManager(addon_utils)
     if "mode" in params:
@@ -35,7 +36,7 @@ def run():
 
             if mode == "streams":
                 path = url
-                contents = sm.get_streams(path)
+                contents = sm.get_streams(path, page, page_size)
                 addon_utils.view_menu(contents)
             if mode == "watch":
                 media_url = requests.utils.unquote(url)
@@ -46,4 +47,4 @@ def run():
         except Exception as e:
             addon_utils.show_error(e)
     else:
-        addon_utils.view_menu(sm.get_streams("/home/claes/tmp/Vimjoyer"))
+        addon_utils.view_menu(sm.get_streams("/home/claes/tmp/Vimjoyer", 1, page_size))
