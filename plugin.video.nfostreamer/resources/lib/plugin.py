@@ -25,7 +25,7 @@ def run():
 
     addon_utils = AddonUtils()
     params = parse_qs(sys.argv[2][1:])
-    page_size = 10
+    page_size = 50
 
     sm = StreamManager(addon_utils)
     if "mode" in params:
