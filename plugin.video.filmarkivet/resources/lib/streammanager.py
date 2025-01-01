@@ -13,9 +13,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from pathlib import Path
 import os
 from datetime import datetime
 import xml.etree.ElementTree as ET
+import xbmc
 
 class StreamManager():
 
@@ -58,7 +60,14 @@ class StreamManager():
         if not os.path.exists(nfo_file_path):
             raise FileNotFoundError(f"The corresponding .nfo file was not found: {nfo_file_path}")
 
-        tree = ET.parse(nfo_file_path)
+        with open(nfo_file_path, 'r', encoding='utf-8') as nfo_file:
+            nfo_content = nfo_file.read()
+  
+        try:
+            tree = ET.ElementTree(ET.fromstring(nfo_content))
+        except ET.ParseError as e:
+            raise ValueError(f"Error parsing XML in {nfo_file_path}: {e}")
+  
         root = tree.getroot()
 
         title = root.findtext('title', default='')
@@ -68,7 +77,6 @@ class StreamManager():
         tag = root.findtext('tag', default='')
 
         return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag, modified_time)
-        #return self.StreamInfo(streamURL, title, sorttitle, plot, thumb, tag, 0)
 
 
     def list_directories(self, path):
@@ -83,9 +91,10 @@ class StreamManager():
         if not os.path.isdir(directory):
             raise ValueError("Provided path must be a directory")
 
-        strm_files = [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.strm')]
+        strm_files = [str(file) for file in Path(directory).iterdir() if file.suffix == '.strm']
         strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)        
         return strm_files
+
 
     def get_streams(self, path):
         list_items = []
