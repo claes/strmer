@@ -18,7 +18,7 @@ import requests
 import xbmcgui
 import xbmcplugin
 from resources.lib.filmarkivet import Filmarkivet
-from resources.lib.kodiutils import AddonUtils, keyboard_get_string
+from resources.lib.kodiutils import AddonUtils
 from urllib.parse import parse_qs
 
 
@@ -26,9 +26,6 @@ def run():
 
     addon_utils = AddonUtils()
     params = parse_qs(sys.argv[2][1:])
-
-    if "content_type" in params:
-        content_type = params["content_type"][0]
 
     fa = Filmarkivet(addon_utils)
     if "mode" in params:
@@ -41,14 +38,6 @@ def run():
                 path = url
                 contents = fa.get_streams(path)
                 addon_utils.view_menu(contents)
-            if mode == "categories":
-                addon_utils.view_menu(fa.get_categories())
-            if mode == "category" and url:
-                movies = fa.get_url_movies(
-                    url, mode="category", page=page, limit=True
-                )
-                addon_utils.view_menu(movies)
-
             if mode == "watch":
                 media_url = requests.utils.unquote(url)
                 xbmcplugin.setResolvedUrl(

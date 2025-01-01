@@ -36,22 +36,12 @@ class AddonUtils():
         self.cache_file = xbmcvfs.translatePath(os.path.join(self.profile_dir,
                                                              "requests_cache"))
 
-    def localize(self, *args):
-        if len(args) < 1:
-            raise ValueError("String id missing")
-        elif len(args) == 1:
-            string_id = args[0]
-            return self.addon.getLocalizedString(string_id)
-        else:
-            return [self.addon.getLocalizedString(string_id) for string_id in args]
-
     def view_menu(self, menu):
         items = []
         for item in menu:
             li = xbmcgui.ListItem(label=item.title, offscreen=True)
             li.setArt({"thumb": item.icon})
-            li.setInfo("video", {"title": item.title, "year": item.year,
-                "duration": item.duration})
+            li.setInfo("video", {"title": item.title})
             if item.playable:
                 li.setProperty("IsPlayable", "true")
                 li.setInfo("video", {"plot": item.description})
@@ -62,15 +52,3 @@ class AddonUtils():
     def url_for(self, url):
         return "plugin://{0}{1}".format(self.id, url)
 
-    def show_error(self, e):
-        xbmcgui.Dialog().textviewer("{0} - {1}".format(
-            self.name, self.localize(30002)), "Error: {0}".format(str(e)))
-
-
-def keyboard_get_string(default, message):
-    keyboard = xbmc.Keyboard(default, message)
-    keyboard.doModal()
-    if (keyboard.isConfirmed()):
-        return keyboard.getText()
-    else:
-        return None
