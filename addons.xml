@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.strmer" name="strmer" version="v0.0.1" provider-name="claes">
+<addon id="plugin.video.strmer" name="strmer" version="v0.0.2" provider-name="claes">
   <requires>
-    <import addon="xbmc.python" version="v0.0.1" />
-    <import addon="script.module.requests" version="v0.0.1" />
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.requests" version="2.22.0+matrix.1" />
   </requires>
   <extension library="addon.py" point="xbmc.python.pluginsource">
     <provides>video</provides>
@@ -13,7 +13,7 @@
     <language>sv</language>
     <email></email>
     <license>GPL-3.0-or-later</license>
-    <source>https:/v/github.com/claes/plugin.video.strmer</source>
+    <source>https://github.com/claes/strmer</source>
     <summary lang="en_GB">Stream from .nfo and .strm files</summary>
     <description lang="en_GB">Stream from .nfo and .strm files</description>
     <assets>
