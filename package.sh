@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-zip -r plugin.video.nfostreamer.zip plugin.video.nfostreamer -x "plugin.video.nfostreamer/resources/lib/__pycache__/*"
+zip -r plugin.video.strmer.zip plugin.video.strmer -x "plugin.video.strmer/resources/lib/__pycache__/*"

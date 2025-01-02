@@ -47,4 +47,4 @@ def run():
         except Exception as e:
             addon_utils.show_error(e)
     else:
-        addon_utils.view_menu(sm.get_streams("/home/claes/tmp/Vimjoyer", 1, page_size))
+        addon_utils.view_menu(sm.get_streams("/", 1, page_size))

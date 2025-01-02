@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nfostreamer" name="NFOStreamer" version="0.1" provider-name="claes">
+<addon id="plugin.video.strmer" name="strmer" version="0.1" provider-name="claes">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
     <import addon="script.module.requests" version="2.22.0+matrix.1" />
@@ -12,7 +12,7 @@
     <language>sv</language>
     <email></email>
     <license>GPL-3.0-or-later</license>
-    <source>https://github.com/claes/plugin.video.nfostreamer</source>
+    <source>https:/v/github.com/claes/plugin.video.strmer</source>
     <summary lang="en_GB">Stream from .nfo and .strm files</summary>
     <description lang="en_GB">Stream from .nfo and .strm files</description>
     <assets>
