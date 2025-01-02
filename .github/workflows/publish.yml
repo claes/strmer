@@ -25,6 +25,7 @@ jobs:
     - name: Update version in addon.xml
       run: |
         sed -i "s/version=\"[^\"]*\"/version=\"${VERSION}\"/" plugin.video.strmer/addon.xml
+        sed -i "s/\(<addon[^>]*version=\)\"[^\"]*\"/\1\"${VERSION}\"/" plugin.video.strmer/addon.xml
         echo "Updated addon.xml with version: ${VERSION}"
 
     - name: Package Kodi addon
@@ -36,7 +37,7 @@ jobs:
         mkdir -p repo
         echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' > repo/addons.xml
         echo '<addons>' >> repo/addons.xml
-        unzip -p "plugin.video.strmer-${VERSION}.zip" plugin.video.strmer/addon.xml >> repo/addons.xml
+        unzip -p "plugin.video.strmer-${VERSION}.zip" plugin.video.strmer/addon.xml | sed '1d' >> repo/addons.xml
         echo '</addons>' >> repo/addons.xml
         md5sum repo/addons.xml | cut -d ' ' -f 1 > repo/addons.xml.md5
         mv "plugin.video.strmer-${VERSION}.zip" repo/
