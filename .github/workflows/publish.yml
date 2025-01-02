@@ -36,7 +36,7 @@ jobs:
         mkdir -p repo
         echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' > repo/addons.xml
         echo '<addons>' >> repo/addons.xml
-        unzip -p "plugin.video.strmer-${VERSION}.zip" addon.xml >> repo/addons.xml
+        unzip -p "plugin.video.strmer-${VERSION}.zip" plugin.video.strmer/addon.xml >> repo/addons.xml
         echo '</addons>' >> repo/addons.xml
         md5sum repo/addons.xml | cut -d ' ' -f 1 > repo/addons.xml.md5
         mv "plugin.video.strmer-${VERSION}.zip" repo/
