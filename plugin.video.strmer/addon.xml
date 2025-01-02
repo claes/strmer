@@ -12,7 +12,7 @@
     <language>sv</language>
     <email></email>
     <license>GPL-3.0-or-later</license>
-    <source>https:/v/github.com/claes/plugin.video.strmer</source>
+    <source>https://github.com/claes/strmer</source>
     <summary lang="en_GB">Stream from .nfo and .strm files</summary>
     <description lang="en_GB">Stream from .nfo and .strm files</description>
     <assets>

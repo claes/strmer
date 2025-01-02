@@ -24,7 +24,6 @@ jobs:
 
     - name: Update version in addon.xml
       run: |
-        sed -i "s/version=\"[^\"]*\"/version=\"${VERSION}\"/" plugin.video.strmer/addon.xml
         sed -i "s/\(<addon[^>]*version=\)\"[^\"]*\"/\1\"${VERSION}\"/" plugin.video.strmer/addon.xml
         echo "Updated addon.xml with version: ${VERSION}"
 
