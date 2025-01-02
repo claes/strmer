@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<?xml version="v0.0.1" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.strmer" name="strmer" version="v0.0.1" provider-name="claes">
   <requires>
     <import addon="xbmc.python" version="v0.0.1" />
