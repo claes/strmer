@@ -14,6 +14,7 @@
 '''
 
 import sys
+import requests
 import os
 import xbmc
 import xbmcaddon
@@ -36,19 +37,46 @@ class AddonUtils():
         self.cache_file = xbmcvfs.translatePath(os.path.join(self.profile_dir,
                                                              "requests_cache"))
 
+    def mode_url(self, mode):
+        return "plugin://{0}?mode={1}".format(self.id, mode)
+
+
     def view_menu(self, menu):
         items = []
         for item in menu:
             li = xbmcgui.ListItem(label=item.title, offscreen=True)
-            li.setArt({"thumb": item.icon})
+            li.setArt({"icon": item.icon, "thumb": item.icon, 'poster': item.icon, 'banner' : item.icon, 'landscape' : item.icon, 'clearlogo' : item.icon})
             li.setInfo("video", {"title": item.title})
+            li.setDateTime("2025-01-01")
             if item.playable:
                 li.setProperty("IsPlayable", "true")
                 li.setInfo("video", {"plot": item.description})
+
+                mode_url = self.mode_url("queue")
+                media_url = requests.utils.quote(item.url)
+
+                url = f"{mode_url}&url={media_url}"
+
+                #works queue_url = f"RunPlugin("+"{0}&url={1}&title={2}".format(url, item.url, item.title)+")"
+                queue_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
+
+                xbmc.log("q iu " + item.url, xbmc.LOGINFO)
+                xbmc.log("q qu " + queue_url, xbmc.LOGINFO)
+
+                context_menu = [
+                    ("Add to Queue", queue_url),
+                ]
+                li.addContextMenuItems(context_menu)
+
             items.append((item.url, li, not item.playable))
+        xbmcplugin.setContent(self.handle, 'videos')            
         xbmcplugin.addDirectoryItems(self.handle, items)
         xbmcplugin.endOfDirectory(self.handle)
 
     def url_for(self, url):
         return "plugin://{0}{1}".format(self.id, url)
 
+
+    def show_error(self, e):
+        xbmcgui.Dialog().textviewer("{0} - {1}".format(
+            self.name, "Error"), "Error: {0}".format(str(e)))
