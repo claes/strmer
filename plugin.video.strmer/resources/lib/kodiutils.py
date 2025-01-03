@@ -54,18 +54,12 @@ class AddonUtils():
 
                 mode_url = self.mode_url("queue")
                 media_url = requests.utils.quote(item.url)
-
                 url = f"{mode_url}&url={media_url}"
-
-                #works queue_url = f"RunPlugin("+"{0}&url={1}&title={2}".format(url, item.url, item.title)+")"
                 queue_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
-
-                xbmc.log("q iu " + item.url, xbmc.LOGINFO)
-                xbmc.log("q qu " + queue_url, xbmc.LOGINFO)
-
                 context_menu = [
                     ("Add to Queue", queue_url),
                 ]
+                
                 li.addContextMenuItems(context_menu)
 
             items.append((item.url, li, not item.playable))

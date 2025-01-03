@@ -48,14 +48,10 @@ def run():
                 )
             if mode == "queue":
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
-
                 mode_url = addon_utils.mode_url("watch")
                 media_url = requests.utils.quote(url)
                 u = f"{mode_url}&url={media_url}"
                 list_item = xbmcgui.ListItem(label=title, path=u)
-                xbmc.log("queue u " + u, xbmc.LOGINFO)
-                xbmc.log("queue media_url " + media_url, xbmc.LOGINFO)
-
                 playlist.add(url, list_item)
 
         except Exception as e:
