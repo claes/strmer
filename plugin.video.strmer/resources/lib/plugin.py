@@ -54,19 +54,17 @@ def run():
                 playlist.add(url, playlist_item)
             if mode == "queuedir":
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
+                inner_params = parse_qs(url)
+                path = inner_params["url"][0] if "url" in inner_params else None
+                strm_files = sm.list_strm_files(path)
+                for file in strm_files:
+                    try:
+                        stream_info = sm.parse_strm_and_nfo(file)
+                        playlist_item = xbmcgui.ListItem(label=stream_info.title, path=stream_info.streamURL)
+                        playlist.add(stream_info.streamURL, playlist_item)
+                    except Exception as e:
+                        xbmc.log(f"Error processing file {file}: {e}", xbmc.LOGERROR)
 
-                params2 = parse_qs(url)
-                url2 = params2["url"][0] if "url" in params2 else None
-                list_items = sm.get_streams(url2, 1, 100, include_dirs=False)
-
-                for list_item in list_items:
-                    if list_item.playable:
-                        mode_url = addon_utils.mode_url("watch")
-                        media_url_encoded = requests.utils.quote(list_item.url)
-                        u = f"{mode_url}&url={media_url_encoded}"
-
-                        playlist_item = xbmcgui.ListItem(label=list_item.title, path=u)
-                        playlist.add(u, playlist_item)
 
         except Exception as e:
             addon_utils.show_error(e)
