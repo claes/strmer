@@ -102,7 +102,7 @@ class StreamManager():
         strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)        
         return strm_files
 
-    def get_streams(self, path, page, page_size):
+    def get_streams(self, path, page, page_size, include_dirs=True):
         if page < 1:
             raise ValueError("Page number must be greater than or equal to 1.")
         if page_size < 1:
@@ -110,20 +110,21 @@ class StreamManager():
         
         list_items = []
 
-        directories = self.list_directories(path)
-        for dir in directories:
-            mode_url = self.mode_url("streams")
-            try:
-                list_item = self.ListItem(
-                    title=dir,
-                    url="{0}&url={1}".format(mode_url, os.path.join(path, dir)),
-                    description="",
-                    icon=""
-                )
-                list_item.playable = False
-                list_items.append(list_item)
-            except Exception as e:
-                print(f"Error processing directory {dir}: {e}")
+        if include_dirs:
+            directories = self.list_directories(path)
+            for dir in directories:
+                mode_url = self.mode_url("streams")
+                try:
+                    list_item = self.ListItem(
+                        title=dir,
+                        url="{0}&url={1}".format(mode_url, os.path.join(path, dir)),
+                        description="",
+                        icon=""
+                    )
+                    list_item.playable = False
+                    list_items.append(list_item)
+                except Exception as e:
+                    print(f"Error processing directory {dir}: {e}")
 
         strm_files = self.list_strm_files(path)
         for file in strm_files:

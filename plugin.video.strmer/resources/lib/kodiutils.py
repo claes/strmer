@@ -59,8 +59,20 @@ class AddonUtils():
                 context_menu = [
                     ("Add to Queue", queue_url),
                 ]
-                
+
                 li.addContextMenuItems(context_menu)
+
+            else:
+                mode_url = self.mode_url("queuedir")
+                media_url = requests.utils.quote(item.url)
+                url = f"{mode_url}&url={media_url}"
+                queue_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
+                xbmc.log("QUEUE URL " + queue_url, xbmc.LOGINFO)
+                context_menu = [
+                    ("Add directory to Queue", queue_url),
+                ]
+                li.addContextMenuItems(context_menu)
+
 
             items.append((item.url, li, not item.playable))
         xbmcplugin.setContent(self.handle, 'videos')            
