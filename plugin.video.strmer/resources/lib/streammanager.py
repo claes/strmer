@@ -18,6 +18,7 @@ import os
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import xbmc
+import requests
 
 class StreamManager():
 
@@ -145,9 +146,10 @@ class StreamManager():
             mode_url = self.mode_url("watch")
             try:
                 stream_info = self.parse_strm_and_nfo(file)
+                media_url = requests.utils.quote(stream_info.streamURL)
                 list_item = self.ListItem(
-                    title=stream_info.title,
-                    url="{0}&url={1}".format(mode_url, stream_info.streamURL),
+                    title=stream_info.title,                    
+                    url="{0}&url={1}".format(mode_url, media_url),
                     description=stream_info.plot,
                     icon=stream_info.thumb
                 )
