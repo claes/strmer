@@ -94,12 +94,26 @@ class StreamManager():
         return [d.name for d in directories]
 
 
-    def list_strm_files(self, directory):
+    def list_strm_files(self, directory, recursive=False):
         if not os.path.isdir(directory):
             raise ValueError("Provided path must be a directory")
 
-        strm_files = [str(file) for file in Path(directory).iterdir() if file.suffix == '.strm']
-        strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)        
+        strm_files = []
+
+        if recursive:
+            def gather_files(dir_path):
+                for file in Path(dir_path).iterdir():
+                    if file.is_dir():
+                        gather_files(file)
+                    elif file.suffix == '.strm':
+                        strm_files.append(str(file))
+
+            gather_files(directory)
+        else:
+            # Only list .strm files in the given directory
+            strm_files = [str(file) for file in Path(directory).iterdir() if file.suffix == '.strm']
+
+        strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
         return strm_files
 
     def get_streams(self, path, page, page_size, include_dirs=True):

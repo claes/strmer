@@ -66,11 +66,15 @@ class AddonUtils():
                 media_url = requests.utils.quote(item.url)
                 url = f"{mode_url}&url={media_url}"
                 queue_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
+
+                mode_url = self.mode_url("queuedir_recursive")
+                url = f"{mode_url}&url={media_url}"
+                queue_url_recursive = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
                 context_menu = [
                     ("Add to queue", queue_url),
+                    ("Add to queue (recursive)", queue_url_recursive),
                 ]
                 li.addContextMenuItems(context_menu)
-
 
             items.append((item.url, li, not item.playable))
         xbmcplugin.setContent(self.handle, 'videos')            
