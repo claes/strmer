@@ -52,23 +52,15 @@ def run():
                 u = f"{mode_url}&url={media_url}"
                 playlist_item = xbmcgui.ListItem(label=title, path=u)
                 playlist.add(url, playlist_item)
-            if mode == "queuedir":
+            if mode == "queuedir" or mode == "queuedir_recursive":
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
                 inner_params = parse_qs(url)
                 path = inner_params["url"][0] if "url" in inner_params else None
-                strm_files = sm.list_strm_files(path, recursive=False)
-                for file in strm_files:
-                    try:
-                        stream_info = sm.parse_strm_and_nfo(file)
-                        playlist_item = xbmcgui.ListItem(label=stream_info.title, path=stream_info.streamURL)
-                        playlist.add(stream_info.streamURL, playlist_item)
-                    except Exception as e:
-                        xbmc.log(f"Error processing file {file}: {e}", xbmc.LOGERROR)
-            if mode == "queuedir_recursive":
-                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
-                inner_params = parse_qs(url)
-                path = inner_params["url"][0] if "url" in inner_params else None
-                strm_files = sm.list_strm_files(path, recursive=True)
+                if mode == "queuedir":
+                    strm_files = sm.list_strm_files(path, recursive=False)
+                else: 
+                    strm_files = sm.list_strm_files(path, recursive=True)
+
                 for file in strm_files:
                     try:
                         stream_info = sm.parse_strm_and_nfo(file)
