@@ -31,7 +31,6 @@ class AddonUtils():
         self.handle = int(sys.argv[1])
         self.url = sys.argv[0]
         self.icon = os.path.join(self.addon.getAddonInfo("path"), "icon.png")
-        self.fanart = os.path.join(self.addon.getAddonInfo("path"), "fanart.jpg")
         self.profile_dir = xbmcvfs.translatePath(self.addon.getAddonInfo("Profile"))
         os.makedirs(self.profile_dir, exist_ok=True)
         self.cache_file = xbmcvfs.translatePath(os.path.join(self.profile_dir,

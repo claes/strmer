@@ -18,6 +18,7 @@ import os
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import xbmc
+import xbmcgui
 import requests
 
 class StreamManager():
@@ -117,6 +118,23 @@ class StreamManager():
 
         strm_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
         return strm_files
+    
+    def queue_stream(self, title, path):
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
+        playlist_item = xbmcgui.ListItem(label=title, path=path)
+        playlist.add(path, playlist_item)
+
+    def queue_directory(self, path, recursive):
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
+        strm_files = self.list_strm_files(path, recursive=recursive)
+        for file in strm_files:
+            try:
+                stream_info = self.parse_strm_and_nfo(file)
+                playlist_item = xbmcgui.ListItem(label=stream_info.title, path=stream_info.streamURL)
+                playlist.add(stream_info.streamURL, playlist_item)
+            except Exception as e:
+                xbmc.log(f"Error processing file {file}: {e}", xbmc.LOGERROR)
+
 
     def get_streams(self, path, page, page_size, include_dirs=True):
         if page < 1:
@@ -126,10 +144,10 @@ class StreamManager():
         
         list_items = []
 
+        mode_url = self.mode_url("streams")
         if include_dirs:
             directories = self.list_directories(path)
             for dir in directories:
-                mode_url = self.mode_url("streams")
                 try:
                     full_path=os.path.join(path, dir)
                     modified_time = datetime.utcfromtimestamp(os.path.getmtime(full_path)).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -145,9 +163,9 @@ class StreamManager():
                 except Exception as e:
                     xbmc.log(f"Error processing directory {dir}: {e}", xbmc.LOGERROR)
 
+        mode_url = self.mode_url("watch")
         strm_files = self.list_strm_files(path)
         for file in strm_files:
-            mode_url = self.mode_url("watch")
             try:
                 stream_info = self.parse_strm_and_nfo(file)
                 media_url = requests.utils.quote(stream_info.streamURL)

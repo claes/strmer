@@ -28,7 +28,7 @@ def run():
     params = parse_qs(sys.argv[2][1:])
     page_size = 50
 
-    sm = StreamManager(addon_utils)
+    stream_manager = StreamManager(addon_utils)
     if "mode" in params:
         try:
             mode = params["mode"][0]
@@ -38,39 +38,31 @@ def run():
 
             if mode == "streams":
                 path = url
-                contents = sm.get_streams(path, page, page_size)
-                addon_utils.view_menu(contents)
+                streams = stream_manager.get_streams(path, page, page_size)
+                addon_utils.view_menu(streams)
             if mode == "watch":
                 media_url = requests.utils.unquote(url)
                 xbmcplugin.setResolvedUrl(
                     addon_utils.handle, True, xbmcgui.ListItem(path=media_url)
                 )
             if mode == "queue":
-                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
+                # playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
                 mode_url = addon_utils.mode_url("watch")
                 media_url = requests.utils.quote(url)
                 u = f"{mode_url}&url={media_url}"
-                playlist_item = xbmcgui.ListItem(label=title, path=u)
-                playlist.add(url, playlist_item)
+                stream_manager.queue_stream(title, u)
+
             if mode == "queuedir" or mode == "queuedir_recursive":
-                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
                 inner_params = parse_qs(url)
                 path = inner_params["url"][0] if "url" in inner_params else None
                 if mode == "queuedir":
-                    strm_files = sm.list_strm_files(path, recursive=False)
+                    recursive=False
                 else: 
-                    strm_files = sm.list_strm_files(path, recursive=True)
+                    recursive=True
 
-                for file in strm_files:
-                    try:
-                        stream_info = sm.parse_strm_and_nfo(file)
-                        playlist_item = xbmcgui.ListItem(label=stream_info.title, path=stream_info.streamURL)
-                        playlist.add(stream_info.streamURL, playlist_item)
-                    except Exception as e:
-                        xbmc.log(f"Error processing file {file}: {e}", xbmc.LOGERROR)
-
+                stream_manager.queue_directory(path, recursive)
 
         except Exception as e:
             addon_utils.show_error(e)
     else:
-        addon_utils.view_menu(sm.get_streams("/", 1, page_size))
+        addon_utils.view_menu(stream_manager.get_streams("/", 1, page_size))
