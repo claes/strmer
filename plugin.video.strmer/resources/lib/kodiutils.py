@@ -36,10 +36,15 @@ class AddonUtils():
         os.makedirs(self.profile_dir, exist_ok=True)
         self.cache_file = xbmcvfs.translatePath(os.path.join(self.profile_dir,
                                                              "requests_cache"))
+        sort_methods = [
+            xbmcplugin.SORT_METHOD_VIDEO_TITLE,
+            xbmcplugin.SORT_METHOD_DATE,
+        ]
+        for method in sort_methods:
+            xbmcplugin.addSortMethod(self.handle, method)        
 
     def mode_url(self, mode):
         return "plugin://{0}?mode={1}".format(self.id, mode)
-
 
     def view_menu(self, menu):
         items = []
@@ -47,7 +52,7 @@ class AddonUtils():
             li = xbmcgui.ListItem(label=item.title, offscreen=True)
             li.setArt({"icon": item.icon, "thumb": item.icon, 'poster': item.icon, 'banner' : item.icon, 'landscape' : item.icon, 'clearlogo' : item.icon})
             li.setInfo("video", {"title": item.title})
-            li.setDateTime("2025-01-01")
+            li.setDateTime(item.modified_time)
             if item.playable:
                 li.setProperty("IsPlayable", "true")
                 li.setInfo("video", {"plot": item.description})

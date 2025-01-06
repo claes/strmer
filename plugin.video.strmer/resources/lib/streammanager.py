@@ -33,12 +33,13 @@ class StreamManager():
             self.modified = modified
 
     class ListItem():
-        def __init__(self, title, url, description, icon):
+        def __init__(self, title, url, description, icon, modified_time):
             self.title = title
             self.url = url
             self.description = description
             self.icon = icon
             self.playable = False
+            self.modified_time = modified_time
 
     def __init__(self, addon_utils):
         self.addon_utils = addon_utils
@@ -54,7 +55,7 @@ class StreamManager():
 
         with open(file_path, 'r', encoding='utf-8') as strm_file:
             streamURL = strm_file.read().strip()
-            modified_time = datetime.fromtimestamp(os.fstat(strm_file.fileno()).st_mtime)
+            modified_time = datetime.fromtimestamp(os.fstat(strm_file.fileno()).st_mtime).strftime('%Y-%m-%dT%H:%M:%SZ')
 
         nfo_file_path = f"{base_name}.nfo"
 
@@ -130,16 +131,19 @@ class StreamManager():
             for dir in directories:
                 mode_url = self.mode_url("streams")
                 try:
+                    full_path=os.path.join(path, dir)
+                    modified_time = datetime.utcfromtimestamp(os.path.getmtime(full_path)).strftime('%Y-%m-%dT%H:%M:%SZ')
                     list_item = self.ListItem(
                         title=dir,
-                        url="{0}&url={1}".format(mode_url, os.path.join(path, dir)),
+                        url="{0}&url={1}".format(mode_url, full_path),
                         description="",
-                        icon=""
+                        icon="",
+                        modified_time=modified_time                        
                     )
                     list_item.playable = False
                     list_items.append(list_item)
                 except Exception as e:
-                    print(f"Error processing directory {dir}: {e}")
+                    xbmc.log(f"Error processing directory {dir}: {e}", xbmc.LOGERROR)
 
         strm_files = self.list_strm_files(path)
         for file in strm_files:
@@ -151,12 +155,13 @@ class StreamManager():
                     title=stream_info.title,                    
                     url="{0}&url={1}".format(mode_url, media_url),
                     description=stream_info.plot,
-                    icon=stream_info.thumb
+                    icon=stream_info.thumb,
+                    modified_time=stream_info.modified
                 )
                 list_item.playable = True
                 list_items.append(list_item)
             except Exception as e:
-                print(f"Error processing file {file}: {e}")
+                xbmc.log(f"Error processing file {file}: {e}", xbmc.LOGERROR)
 
         start_index = (page - 1) * page_size
         end_index = start_index + page_size
@@ -164,5 +169,5 @@ class StreamManager():
         sub_list = list_items[start_index:end_index] 
         if end_index < len(list_items):
             next_url = "{0}&url={1}&page={2}".format(self.mode_url("streams"), path, page + 1)
-            sub_list.append(self.ListItem("Next", next_url, None, None))
+            sub_list.append(self.ListItem("Next", next_url, None, None, None))
         return sub_list
