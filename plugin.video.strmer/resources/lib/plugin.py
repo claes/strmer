@@ -41,17 +41,19 @@ def run():
                 streams = stream_manager.get_streams(path, page, page_size)
                 addon_utils.view_menu(streams)
             if mode == "watch":
-                media_url = requests.utils.unquote(url)
+                if url.startswith("http"):
+                    media_url = url
+                else:
+                    media_url = requests.utils.unquote(url)
+
                 xbmcplugin.setResolvedUrl(
                     addon_utils.handle, True, xbmcgui.ListItem(path=media_url)
                 )
             if mode == "queue":
-                # playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO )
                 mode_url = addon_utils.mode_url("watch")
                 media_url = requests.utils.quote(url)
                 u = f"{mode_url}&url={media_url}"
                 stream_manager.queue_stream(title, u)
-
             if mode == "queuedir" or mode == "queuedir_recursive":
                 inner_params = parse_qs(url)
                 path = inner_params["url"][0] if "url" in inner_params else None
@@ -59,7 +61,6 @@ def run():
                     recursive=False
                 else: 
                     recursive=True
-
                 stream_manager.queue_directory(path, recursive)
 
         except Exception as e:
