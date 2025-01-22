@@ -134,14 +134,11 @@ class AddonUtils():
             xbmc.log("yt-dlp is not installed or not found in PATH.", xbmc.LOGERROR)
             return None
 
-    def stream_ffmpeg(self, youtube_url):
+    def ytdlp_ffmpeg(self, youtube_url):
         try:
-
             # yt-dlp -F to select a non VP9 format
             # yt-dlp -f 136+140 -o - 'https://www.youtube.com/watch?v=eDr6_cMtfdA' | ffmpeg -i pipe: -c:v copy -c:a copy -f mpegts -listen 1 http://0.0.0.0:18080
-            # mplayer http://localhost:18080
-            # But ugly artifacts
-            # vlc http://localhost:18080 works well though!
+            # vlc http://localhost:18080 to test
 
             stream_port = "18088"
             yt_dlp_command = [
@@ -152,23 +149,9 @@ class AddonUtils():
                 "-listen", "1", "http://0.0.0.0:" + stream_port
             ]
 
-            xbmc.log("Running yt-dlp", xbmc.LOGERROR)
-
             yt_dlp_proc = subprocess.Popen(yt_dlp_command, stdout=subprocess.PIPE)
             ffmpeg_proc = subprocess.Popen(ffmpeg_command, stdin=yt_dlp_proc.stdout)
-            xbmc.log("Started yt-dlp", xbmc.LOGERROR)
-
-            # Sleep for 1 second while processes run in the background
             time.sleep(5)
-            xbmc.log("Finished sleep", xbmc.LOGERROR)
-
-            # # Use subprocess to pipe yt-dlp to ffmpeg
-            # with subprocess.Popen(yt_dlp_command, stdout=subprocess.PIPE) as yt_dlp_proc:
-            #     with subprocess.Popen(ffmpeg_command, stdin=yt_dlp_proc.stdout) as ffmpeg_proc:
-            #         # Allow the commands to execute and wait for them to finish
-            #         ffmpeg_proc.wait()
-            #         yt_dlp_proc.wait()
-
             return "http://127.0.0.1:" + stream_port
         except subprocess.CalledProcessError as e:
             xbmc.log(f"yt-dlp failed with error code {e.returncode}.", xbmc.LOGERROR)
