@@ -15,13 +15,15 @@
 
 import sys
 import requests
+import time
+import subprocess
 import os
+import re
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
-
 
 class AddonUtils():
     def __init__(self):
@@ -60,9 +62,18 @@ class AddonUtils():
                 media_url = requests.utils.quote(item.url)
                 url = f"{mode_url}&url={media_url}"
                 queue_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
+
                 context_menu = [
                     ("Add to queue", queue_url),
                 ]
+
+                mode_url = self.mode_url("ytdlp")
+                media_url = requests.utils.quote(item.url)
+                url = f"{mode_url}&url={media_url}"
+                ytdlp_url = f"RunPlugin("+"{0}&title={1}".format(url, item.title)+")"
+                context_menu.append(('Play via yt-dlp', ytdlp_url))
+                xbmc.log(ytdlp_url, xbmc.LOGERROR)
+                    
                 li.addContextMenuItems(context_menu)
 
             else:
@@ -88,7 +99,63 @@ class AddonUtils():
     def url_for(self, url):
         return "plugin://{0}{1}".format(self.id, url)
 
-
     def show_error(self, e):
         xbmcgui.Dialog().textviewer("{0} - {1}".format(
             self.name, "Error"), "Error: {0}".format(str(e)))
+
+
+    def extract_youtube_video_id(self, plugin_url):
+        match = re.search(r'plugin://plugin\.video\.youtube/play/\?video_id=([\w-]+)', plugin_url)
+        if match:
+            return match.group(1)
+        return None
+
+    def get_youtube_url(self, video_id):
+        return f"https://www.youtube.com/watch?v={video_id}"
+
+
+    def execute_ytdlp_get_url(self, youtube_url):
+        try:
+            # yt-dlp -F to select a non VP9 format
+            # yt-dlp -f 136+140 -o - 'https://www.youtube.com/watch?v=eDr6_cMtfdA' | ffmpeg -i pipe: -c:v copy -c:a copy -f mpegts -listen 1 http://0.0.0.0:18080
+            # mplayer http://localhost:18080
+            # But ugly artifacts
+            # vlc http://localhost:18080 works well though!
+
+            # Call yt-dlp with the `-g` flag to get the direct URL
+            result = subprocess.run(['yt-dlp', '-f', 'bestvideo', '-g', youtube_url], capture_output=True, text=True, check=True)
+            # The output will be the direct URL
+            direct_url = result.stdout.strip()
+            return direct_url
+        except subprocess.CalledProcessError as e:
+            xbmc.log(f"yt-dlp failed with error code {e.returncode}.", xbmc.LOGERROR)
+            return None
+        except FileNotFoundError:
+            xbmc.log("yt-dlp is not installed or not found in PATH.", xbmc.LOGERROR)
+            return None
+
+    def ytdlp_ffmpeg(self, youtube_url):
+        try:
+            # yt-dlp -F to select a non VP9 format
+            # yt-dlp -f 136+140 -o - 'https://www.youtube.com/watch?v=eDr6_cMtfdA' | ffmpeg -i pipe: -c:v copy -c:a copy -f mpegts -listen 1 http://0.0.0.0:18080
+            # vlc http://localhost:18080 to test
+
+            stream_port = "18088"
+            yt_dlp_command = [
+                "yt-dlp", "-f", "136+140", "-o", "-", youtube_url
+            ]
+            ffmpeg_command = [
+                "ffmpeg", "-i", "pipe:", "-c:v", "copy", "-c:a", "copy", "-f", "mpegts", 
+                "-listen", "1", "http://0.0.0.0:" + stream_port
+            ]
+
+            yt_dlp_proc = subprocess.Popen(yt_dlp_command, stdout=subprocess.PIPE)
+            ffmpeg_proc = subprocess.Popen(ffmpeg_command, stdin=yt_dlp_proc.stdout)
+            time.sleep(5)
+            return "http://127.0.0.1:" + stream_port
+        except subprocess.CalledProcessError as e:
+            xbmc.log(f"yt-dlp failed with error code {e.returncode}.", xbmc.LOGERROR)
+            return None
+        except FileNotFoundError:
+            xbmc.log("yt-dlp is not installed or not found in PATH.", xbmc.LOGERROR)
+            return None

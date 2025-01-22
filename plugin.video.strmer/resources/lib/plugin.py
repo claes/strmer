@@ -49,6 +49,20 @@ def run():
                 xbmcplugin.setResolvedUrl(
                     addon_utils.handle, True, xbmcgui.ListItem(path=media_url)
                 )
+            if mode == "ytdlp":
+                inner_params = parse_qs(url)
+                path = inner_params["url"][0] if "url" in inner_params else None
+                youtube_id = addon_utils.extract_youtube_video_id(path)
+                youtube_url = addon_utils.get_youtube_url(youtube_id)
+                local_url = addon_utils.ytdlp_ffmpeg(youtube_url)
+
+                list_item = xbmcgui.ListItem(label="My Stream")
+                list_item.setPath(local_url)
+                list_item.setProperty('IsPlayable', 'true')
+                list_item.setMimeType('video/mp4')
+                list_item.setContentLookup(False)
+
+                xbmc.Player().play(local_url, list_item)
             if mode == "queue":
                 mode_url = addon_utils.mode_url("watch")
                 media_url = requests.utils.quote(url)
