@@ -49,6 +49,47 @@ def run():
                 xbmcplugin.setResolvedUrl(
                     addon_utils.handle, True, xbmcgui.ListItem(path=media_url)
                 )
+            if mode == "ytdlp":
+                xbmc.log(f"YTDLP", xbmc.LOGERROR)
+                xbmc.log(url, xbmc.LOGERROR)
+                inner_params = parse_qs(url)
+                path = inner_params["url"][0] if "url" in inner_params else None
+                xbmc.log(path, xbmc.LOGERROR)
+
+                youtube_id = addon_utils.extract_youtube_video_id(path)
+                xbmc.log(youtube_id, xbmc.LOGERROR)
+                youtube_url = addon_utils.get_youtube_url(youtube_id)
+                xbmc.log(youtube_url, xbmc.LOGERROR)
+                ytdlp_extracted_url = addon_utils.execute_ytdlp_get_url(youtube_url)
+                xbmc.log("Play" + ytdlp_extracted_url, xbmc.LOGERROR)
+
+                local_url = addon_utils.stream_ffmpeg(youtube_url)
+
+                xbmc.log("Play local_url " + local_url, xbmc.LOGERROR)
+
+                list_item = xbmcgui.ListItem(label="My Stream")
+                list_item.setPath(local_url)
+                list_item.setProperty('IsPlayable', 'true')
+                #list_item.setMimeType('video/mp2t')
+                list_item.setMimeType('video/mp4')
+                list_item.setContentLookup(False)
+
+                xbmc.Player().play(local_url, list_item)
+                # Resolve the URL to play it
+                #xbmcplugin.setResolvedUrl(handle=addon_utils.handle, succeeded=True, listitem=list_item)
+
+                xbmc.log("It should be playing? " + local_url, xbmc.LOGERROR)
+
+                #player = xbmc.Player()
+                #player.play(local_url)
+                # xbmcplugin.setResolvedUrl(
+                #     addon_utils.handle, True, xbmcgui.ListItem(path=local_url)
+                # )
+
+                # xbmcplugin.setResolvedUrl(
+                #     addon_utils.handle, True, xbmcgui.ListItem(path=ytdlp_extracted_url)
+                # )
+
             if mode == "queue":
                 mode_url = addon_utils.mode_url("watch")
                 media_url = requests.utils.quote(url)
