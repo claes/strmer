@@ -142,7 +142,11 @@ class AddonUtils():
 
             stream_port = "18088"
             yt_dlp_command = [
-                "yt-dlp", "-f", "136+140", "-o", "-", youtube_url
+                "yt-dlp", "-f",
+                "(bv*[vcodec~='^((he|a)vc|h26[45])']+ba) / (bv*+ba/b)",
+                #"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b", 
+                #"136+140", 
+                "-o", "-", youtube_url
             ]
             ffmpeg_command = [
                 "ffmpeg", "-i", "pipe:", "-c:v", "copy", "-c:a", "copy", "-f", "mpegts", 
@@ -151,7 +155,7 @@ class AddonUtils():
 
             yt_dlp_proc = subprocess.Popen(yt_dlp_command, stdout=subprocess.PIPE)
             ffmpeg_proc = subprocess.Popen(ffmpeg_command, stdin=yt_dlp_proc.stdout)
-            time.sleep(5)
+            time.sleep(7)
             return "http://127.0.0.1:" + stream_port
         except subprocess.CalledProcessError as e:
             xbmc.log(f"yt-dlp failed with error code {e.returncode}.", xbmc.LOGERROR)
