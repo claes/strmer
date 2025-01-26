@@ -15,6 +15,7 @@
 
 from pathlib import Path
 import os
+import re
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import xbmc
@@ -48,6 +49,13 @@ class StreamManager():
     def mode_url(self, mode):
         return "plugin://{0}?mode={1}".format(self.addon_utils.id, mode)
 
+    def transform_to_sendtokodi(self, input_string):
+        search_pattern = r'plugin://plugin.video.youtube/play/\?video_id=([a-zA-Z0-9_-]+)'
+        replace_pattern = r'plugin://plugin.video.sendtokodi/?\1'
+
+        result = re.sub(search_pattern, replace_pattern, input_string)
+        return result
+
     def parse_strm_and_nfo(self, file_path):
         if not file_path.endswith('.strm'):
             raise ValueError("Provided file must have a .strm extension")
@@ -55,7 +63,8 @@ class StreamManager():
         base_name = os.path.splitext(file_path)[0]
 
         with open(file_path, 'r', encoding='utf-8') as strm_file:
-            streamURL = strm_file.read().strip()
+            originalStreamURL = strm_file.read().strip()
+            streamURL = self.transform_to_sendtokodi(originalStreamURL)
             modified_time = datetime.fromtimestamp(os.fstat(strm_file.fileno()).st_mtime).strftime('%Y-%m-%dT%H:%M:%SZ')
 
         nfo_file_path = f"{base_name}.nfo"
