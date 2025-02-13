@@ -26,7 +26,7 @@
     # Provide some binary packages for selected system types.
     packages = forAllSystems (system: let
       pkgs = nixpkgsFor.${system};
-    in {
+
       strmer = pkgs.buildGoModule {
         pname = "strmer";
         inherit version;
@@ -45,11 +45,17 @@
         #vendorSha256 = pkgs.lib.fakeSha256;
 
         nativeBuildInputs = [];
-
         buildInputs = [];
 
         vendorHash = null;
+
+        #Also copy the Kodi Python plugin to the result
+        postInstall = ''
+          cp -r plugin.video.strmer $out/plugin.video.strmer
+        '';
       };
+    in {
+      strmer = strmer;
     });
 
     devShells = forAllSystems (system: let
@@ -74,9 +80,7 @@
       };
     });
 
-    # The default package for 'nix build'. This makes sense if the
-    # flake provides only one package or there is a clear "main"
-    # package.
+    # The default package for 'nix build'.
     defaultPackage = forAllSystems (system: self.packages.${system}.strmer);
   };
 }
